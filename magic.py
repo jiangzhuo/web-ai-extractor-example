@@ -3,6 +3,18 @@ import json
 import micropip
 from js import document, window
 
+prompt_oneshot = r"""
+Output in the following json string format: {'###code###': '<code or number of the product, type: str>', '###price###': '<Number of the product price, type: int>'}
+Update text enclosed in <>. Output only a valid json string beginning with { and ending with }
+========================================
+[ INGNI イング ]
+商品番号：1241-100468
+【7／2までの限定価格】【WEB限定】ラインストーン飛ばしTシャツ
+￥3,190 10％off
+￥2,871(税込)
+========================================
+output of this content is: {"###code###": "1241-100468", "###price###": 2871}
+"""
 
 async def main(resource_root, selector, system_prompt, output_format):
     try:
@@ -33,29 +45,20 @@ async def main(resource_root, selector, system_prompt, output_format):
     try:
         async def custom_llm(system_prompt: str, user_prompt: str):
             ''' you can change it to your own LLM '''
+            # session = await window.ai.createTextSession({"temperature": 0, "topK": 10})
             session = await window.ai.createTextSession()
             prompt = (
-                    r"""Output in the following json string format: {'###code###': '<code or number of the product, type: str>', '###price###': '<Number of the product price, type: int>'}
-                    Update text enclosed in <>. Output only a valid json string beginning with { and ending with }
-                    ========================================
-                    [ INGNI イング ]
-                    商品番号：1241-100468                    
-                    【7／2までの限定価格】【WEB限定】ラインストーン飛ばしTシャツ
-                    ￥3,190 10％off
-                    ￥2,871(税込)
-                    ========================================
-                    output of this content is: {"###code###": "1241-100468", "###price###": 2871}
-                    """
+                    prompt_oneshot
                     + "<ctrl23>"
                     + system_prompt
-                    + "========================================"
+                    + "\n========================================\n"
                     + user_prompt
-                    + "========================================"
+                    + "\n========================================\n"
                     + "output of this content is: "
             )
             result = await session.prompt(prompt)
             session.destroy()
-            print(result)
+            print(prompt)
             return result
 
         res = await strict_json_async(
@@ -63,6 +66,7 @@ async def main(resource_root, selector, system_prompt, output_format):
             user_prompt=text,
             output_format=json.loads(output_format),
             return_as_json=True,
+            num_tries=5,
             llm=custom_llm)  # set this to your own LLM
 
     except Exception as e:
