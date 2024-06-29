@@ -44,33 +44,23 @@ async function checkGeminiSupport() {
 }
 
 // Function to load and run the main script
-async function main() {
-    async function getPythonScript(scriptPath) {
-        const scriptResponse = await fetch(window.kizuna_ai_web_ai_extractor_example_root + scriptPath);
-        if (!scriptResponse.ok) {
-            throw new Error(`Failed to fetch the script: ${scriptResponse.statusText}`);
-        }
-        return await scriptResponse.text();
-    }
-
+async function main(selector, system_prompt, output_format) {
+    console.log(arguments)
     try {
-        const pyodide = await loadPyodide();
-        await pyodide.loadPackage("micropip");
-        // wait until the document readyState is complete
-        await new Promise((resolve) => {
-            if (document.readyState === 'complete') {
-                resolve();
-            } else {
-                document.addEventListener('readystatechange', () => {
-                    if (document.readyState === 'complete') {
-                        resolve();
-                    }
-                });
-            }
-        });
+        window.pyodide.globals.set("selector", selector);
+        window.pyodide.globals.set("system_prompt", system_prompt);
+        window.pyodide.globals.set("output_format", output_format);
 
         // load the main script
-        return pyodide.runPython(await getPythonScript("/magic.py"));
+        async function getPythonScript(scriptPath) {
+            const scriptResponse = await fetch(window.pyodide.globals.get('resource_root') + scriptPath);
+            if (!scriptResponse.ok) {
+                throw new Error(`Failed to fetch the script: ${scriptResponse.statusText}`);
+            }
+            return await scriptResponse.text();
+        }
+
+        return window.pyodide.runPython(await getPythonScript("/magic.py"));
     } catch (error) {
         console.error('Error in main function:', error);
         throw error;
@@ -78,10 +68,32 @@ async function main() {
 }
 
 // Function to run the main script if all conditions are met
-async function runScriptIfConditionsMet() {
+async function runScriptIfConditionsMet(selector, system_prompt, output_format) {
+    const resource_root = window.kizuna_ai_web_ai_extractor_example_root;
+    if (!selector) selector = window.kizuna_ai_web_ai_extractor_example_selector;
+    if (!system_prompt) system_prompt = window.kizuna_ai_web_ai_extractor_example_prompt;
+    if (!output_format) output_format = window.kizuna_ai_web_ai_extractor_example_output_format;
     try {
         if (checkBrowserVersion() && await checkTopLevelAwaitSupport() && await checkGeminiSupport()) {
-            const res = await main();
+            if (!window.pyodide) {
+                const pyodide = await loadPyodide();
+                await pyodide.loadPackage("micropip");
+                // wait until the document readyState is complete
+                await new Promise((resolve) => {
+                    if (document.readyState === 'complete') {
+                        resolve();
+                    } else {
+                        document.addEventListener('readystatechange', () => {
+                            if (document.readyState === 'complete') {
+                                resolve();
+                            }
+                        });
+                    }
+                });
+                pyodide.globals.set("resource_root", resource_root);
+                window.pyodide = pyodide;
+            }
+            const res = await main(selector, system_prompt, output_format);
             if (res) console.log((JSON.parse(res)));
         } else {
             console.log('Your browser does not meet the requirements to run the script');
@@ -91,18 +103,25 @@ async function runScriptIfConditionsMet() {
     }
 }
 
-if(!window.kizuna_ai_web_ai_extractor_example_selector) window.kizuna_ai_web_ai_extractor_example_selector = "#rightArea";
-if(!window.kizuna_ai_web_ai_extractor_example_prompt) window.kizuna_ai_web_ai_extractor_example_prompt = "You are a product information extractor, I wll give you some text and you need to extract information from it.";
-if(!window.kizuna_ai_web_ai_extractor_example_output_format) window.kizuna_ai_web_ai_extractor_example_output_format = JSON.stringify({
+window.kizuna_ai_web_ai_extractor = main;
+
+if (!window.kizuna_ai_web_ai_extractor_example_selector) window.kizuna_ai_web_ai_extractor_example_selector = "#rightArea";
+if (!window.kizuna_ai_web_ai_extractor_example_prompt) window.kizuna_ai_web_ai_extractor_example_prompt = "You are a product information extractor, I wll give you some text and you need to extract information from it.";
+if (!window.kizuna_ai_web_ai_extractor_example_output_format) window.kizuna_ai_web_ai_extractor_example_output_format = JSON.stringify({
     "product_code": "code or number of the product, type: str",
     "price": "Number of the product price, type: int",
     "description": "Description of the product, type: str"
 });
 
-let kizunaAICurrentScriptUrl = document.currentScript.src;
-window.kizuna_ai_web_ai_extractor_example_root = kizunaAICurrentScriptUrl.substring(0, kizunaAICurrentScriptUrl.lastIndexOf('/'));
-let kizunaAIDependencyScript = document.createElement('script');
-kizunaAIDependencyScript.src = 'https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.js';
-kizunaAIDependencyScript.onload = runScriptIfConditionsMet;
-kizunaAIDependencyScript.onerror = () => console.error('Failed to load Pyodide script');
-document.head.appendChild(kizunaAIDependencyScript);
+window.kizuna_ai_current_script_url = document.currentScript.src;
+window.kizuna_ai_web_ai_extractor_example_root = kizuna_ai_current_script_url.substring(0, kizuna_ai_current_script_url.lastIndexOf('/'));
+if (!document.getElementById('kizuna-ai-web-ai-extractor-example-script')) {
+    const script = document.createElement('script');
+    script.id = 'kizuna-ai-web-ai-extractor-example-script';
+    script.src = 'https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.js';
+    script.onload = () => runScriptIfConditionsMet();
+    script.onerror = () => console.error('Failed to load Pyodide script');
+    document.head.appendChild(script);
+}
+
+

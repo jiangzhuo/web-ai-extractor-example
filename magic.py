@@ -1,16 +1,15 @@
 import json
 
 import micropip
-from js import document, kizuna_ai_web_ai_extractor_example_root, kizuna_ai_web_ai_extractor_example_selector, \
-    kizuna_ai_web_ai_extractor_example_prompt, kizuna_ai_web_ai_extractor_example_output_format, window
+from js import document, window
 
 
-async def main():
+async def main(resource_root, selector, system_prompt, output_format):
     try:
         await micropip.install("numpy")
-        await micropip.install(f"{kizuna_ai_web_ai_extractor_example_root}/whl/inscriptis-2.5.0-py3-none-any.whl")
-        await micropip.install(f"{kizuna_ai_web_ai_extractor_example_root}/whl/strictjson-4.1.0-py3-none-any.whl")
-        await micropip.install(f"{kizuna_ai_web_ai_extractor_example_root}/whl/taskgen_ai-2.4.1-py3-none-any.whl")
+        await micropip.install(f"{resource_root}/whl/inscriptis-2.5.0-py3-none-any.whl")
+        await micropip.install(f"{resource_root}/whl/strictjson-4.1.0-py3-none-any.whl")
+        await micropip.install(f"{resource_root}/whl/taskgen_ai-2.4.1-py3-none-any.whl")
         from inscriptis import get_text
         # from strictjson import strict_json_async
         from taskgen import strict_json_async
@@ -21,9 +20,10 @@ async def main():
 
     try:
         # Extract text from HTML
-        selected_dom = document.querySelector(kizuna_ai_web_ai_extractor_example_selector)
+        selected_dom = document.querySelector(selector)
         if selected_dom is None:
-            raise ValueError("No element found with the given selector, please check the window.kizuna_ai_web_ai_extractor_example_selector variable.")
+            raise ValueError(
+                "No element found with the given selector, please check the window.kizuna_ai_web_ai_extractor_example_selector variable.")
         html = selected_dom.outerHTML
         text = get_text(html)
     except Exception as e:
@@ -50,9 +50,9 @@ async def main():
             return result
 
         res = await strict_json_async(
-            system_prompt=kizuna_ai_web_ai_extractor_example_prompt,
+            system_prompt=system_prompt,
             user_prompt=text,
-            output_format=json.loads(kizuna_ai_web_ai_extractor_example_output_format),
+            output_format=json.loads(output_format),
             return_as_json=True,
             llm=custom_llm)  # set this to your own LLM
 
@@ -63,4 +63,4 @@ async def main():
     return res
 
 
-main()
+main(resource_root, selector, system_prompt, output_format)
