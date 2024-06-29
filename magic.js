@@ -92,8 +92,11 @@ async function runScriptIfConditionsMet(selector, system_prompt, output_format) 
                 pyodide.globals.set("resource_root", resource_root);
                 window.pyodide = pyodide;
             }
-            const res = await main(selector, system_prompt, output_format);
-            if (res) console.log((JSON.parse(res)));
+            // const res = await main(selector, system_prompt, output_format);
+            // Dispatch a custom event to signal that pyodide is ready
+            console.log('kizunai_ai_web_ai_extractor is ready');
+            const event = new CustomEvent('kizuna_ai_web_ai_extractor_ready');
+            window.dispatchEvent(event);
         } else {
             console.log('Your browser does not meet the requirements to run the script');
         }
@@ -104,13 +107,13 @@ async function runScriptIfConditionsMet(selector, system_prompt, output_format) 
 
 window.kizuna_ai_web_ai_extractor = main;
 
-if (!window.kizuna_ai_web_ai_extractor_example_selector) window.kizuna_ai_web_ai_extractor_example_selector = "#rightArea";
-if (!window.kizuna_ai_web_ai_extractor_example_prompt) window.kizuna_ai_web_ai_extractor_example_prompt = "You are a product information extractor, I wll give you some text and you need to extract information from it.";
-if (!window.kizuna_ai_web_ai_extractor_example_output_format) window.kizuna_ai_web_ai_extractor_example_output_format = JSON.stringify({
-    "product_code": "code or number of the product, type: str",
-    "price": "Number of the product price, type: int",
-    "description": "Description of the product, type: str"
-});
+// if (!window.kizuna_ai_web_ai_extractor_example_selector) window.kizuna_ai_web_ai_extractor_example_selector = "#rightArea";
+// if (!window.kizuna_ai_web_ai_extractor_example_prompt) window.kizuna_ai_web_ai_extractor_example_prompt = "You are a product information extractor, I wll give you some text and you need to extract information from it.";
+// if (!window.kizuna_ai_web_ai_extractor_example_output_format) window.kizuna_ai_web_ai_extractor_example_output_format = JSON.stringify({
+//     "product_code": "code or number of the product, type: str",
+//     "price": "Number of the product price, type: int",
+//     "description": "Description of the product, type: str"
+// });
 
 window.kizuna_ai_current_script_url = document.currentScript.src;
 window.kizuna_ai_web_ai_extractor_example_root = kizuna_ai_current_script_url.substring(0, kizuna_ai_current_script_url.lastIndexOf('/'));

@@ -23,7 +23,7 @@ async def main(resource_root, selector, system_prompt, output_format):
         selected_dom = document.querySelector(selector)
         if selected_dom is None:
             raise ValueError(
-                "No element found with the given selector, please check the window.kizuna_ai_web_ai_extractor_example_selector variable.")
+                "No element found with the given selector, please check the kizuna_ai_web_ai_extractor_example_selector variable.")
         html = selected_dom.outerHTML
         text = get_text(html)
     except Exception as e:
@@ -33,7 +33,6 @@ async def main(resource_root, selector, system_prompt, output_format):
     try:
         async def custom_llm(system_prompt: str, user_prompt: str):
             ''' you can change it to your own LLM '''
-            print(system_prompt)
             session = await window.ai.createTextSession()
             prompt = (system_prompt
                       + "<ctrl23>"

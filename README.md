@@ -247,9 +247,9 @@ main()
 ```js
 (function() {
     // the area content useful information
-    window.kizuna_ai_web_ai_extractor_example_selector = "#rightArea";
+    window.kizuna_ai_web_ai_extractor_example_selector = "#itemDetails";
     // the system prompt 
-    window.kizuna_ai_web_ai_extractor_example_prompt = "You are a product information extractor, I wll give you some text and you need to extract information from it.";
+    window.kizuna_ai_web_ai_extractor_example_prompt = "You are a product information extractor, I will give you some text and you need to extract information from it.";
     // the output json format
     window.kizuna_ai_web_ai_extractor_example_output_format = JSON.stringify({
         "name": "name of the product, type: str",
@@ -257,7 +257,11 @@ main()
         "price": "Number of the product price, type: str",
         "description": "Description of the product, type: str"
     })
-    var script = document.createElement('script');
+    window.addEventListener('kizuna_ai_web_ai_extractor_ready', async ()=>{
+        await window.kizuna_ai_web_ai_extractor(window.kizuna_ai_web_ai_extractor_example_selector, window.kizuna_ai_web_ai_extractor_example_prompt, window.kizuna_ai_web_ai_extractor_example_output_format)
+    });
+
+    const script = document.createElement('script');
     script.src = 'https://lab.kizuna.ai/web-ai-extractor-example/magic.js';
     script.type = 'text/javascript';
     script.async = true;
@@ -286,7 +290,7 @@ Solutions to the above issues:
 * You can replace the LLM with others, such as using Transformers.js + ONNX Runtime WebGPU. This is exactly what I do in actual production.
 
 
-## 源代码uuuuuuuuu
+## Source Code
 https://github.com/jiangzhuo/web-ai-extractor-example
 
 https://github.com/jiangzhuo/strictjson
