@@ -45,7 +45,6 @@ async function checkGeminiSupport() {
 
 // Function to load and run the main script
 async function main(selector, system_prompt, output_format) {
-    console.log(arguments)
     try {
         window.pyodide.globals.set("selector", selector);
         window.pyodide.globals.set("system_prompt", system_prompt);
