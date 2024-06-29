@@ -32,7 +32,6 @@ async def main(resource_root, selector, system_prompt, output_format):
 
     try:
         async def custom_llm(system_prompt: str, user_prompt: str):
-            print(system_prompt)
             ''' you can change it to your own LLM '''
             session = await window.ai.createTextSession()
             prompt = (
