@@ -55,6 +55,7 @@ async def main(resource_root, selector, system_prompt, output_format):
             )
             result = await session.prompt(prompt)
             session.destroy()
+            print(result)
             return result
 
         res = await strict_json_async(
