@@ -91,17 +91,16 @@ async function runScriptIfConditionsMet() {
     }
 }
 
+if(!window.kizuna_ai_web_ai_extractor_example_selector) window.kizuna_ai_web_ai_extractor_example_selector = "#rightArea";
+if(!window.kizuna_ai_web_ai_extractor_example_prompt) window.kizuna_ai_web_ai_extractor_example_prompt = "You are a product information extractor, I wll give you some text and you need to extract information from it.";
+if(!window.kizuna_ai_web_ai_extractor_example_output_format) window.kizuna_ai_web_ai_extractor_example_output_format = JSON.stringify({
+    "product_code": "code or number of the product, type: str",
+    "price": "Number of the product price, type: int",
+    "description": "Description of the product, type: str"
+});
 
 let kizunaAICurrentScriptUrl = document.currentScript.src;
 window.kizuna_ai_web_ai_extractor_example_root = kizunaAICurrentScriptUrl.substring(0, kizunaAICurrentScriptUrl.lastIndexOf('/'));
-// window.kizuna_ai_web_ai_extractor_example_selector = "#rightArea";
-// window.kizuna_ai_web_ai_extractor_example_prompt = "You are a product information extractor, I wll give you some text and you need to extract information from it.";
-// window.kizuna_ai_web_ai_extractor_example_output_format = JSON.stringify({
-//     "product_code": "code or number of the product, type: str",
-//     "price": "Number of the product price, type: int",
-//     "description": "Description of the product, type: str"
-// })
-
 let kizunaAIDependencyScript = document.createElement('script');
 kizunaAIDependencyScript.src = 'https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.js';
 kizunaAIDependencyScript.onload = runScriptIfConditionsMet;
