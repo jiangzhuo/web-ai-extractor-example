@@ -32,17 +32,28 @@ async def main(resource_root, selector, system_prompt, output_format):
 
     try:
         async def custom_llm(system_prompt: str, user_prompt: str):
+            print(system_prompt)
             ''' you can change it to your own LLM '''
             session = await window.ai.createTextSession()
-            prompt = (system_prompt
-                      + "<ctrl23>"
-                        r"""Output in the following json string format: {'###code###': '<code or number of the product, type: str>', '###price###': '<Number of the product price, type: str>'}
-                        Update text enclosed in <>. Output only a valid json string beginning with { and ending with }
-                        商品番号：1241-100468
-                        output of this content is: {"###code###": "1241-100468"}
-                        """
-                      + "<ctrl23>"
-                      + user_prompt)
+            prompt = (
+                    r"""Output in the following json string format: {'###code###': '<code or number of the product, type: str>', '###price###': '<Number of the product price, type: int>'}
+                    Update text enclosed in <>. Output only a valid json string beginning with { and ending with }
+                    ========================================
+                    [ INGNI イング ]
+                    商品番号：1241-100468                    
+                    【7／2までの限定価格】【WEB限定】ラインストーン飛ばしTシャツ
+                    ￥3,190 10％off
+                    ￥2,871(税込)
+                    ========================================
+                    output of this content is: {"###code###": "1241-100468", "###price###": 2871}
+                    """
+                    + "<ctrl23>"
+                    + system_prompt
+                    + "========================================"
+                    + user_prompt
+                    + "========================================"
+                    + "output of this content is: "
+            )
             result = await session.prompt(prompt)
             session.destroy()
             print(result)
