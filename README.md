@@ -15,6 +15,8 @@ You can also refer to this [blog](https://azukiazusa.dev/blog/try-chrome-interna
 
 For more information on how to use the latest API, visit [AI on Chrome](https://developer.chrome.com/docs/ai/built-in).
 
+After completing the above steps, you can try the [following code](#result) to extract information from webpages.
+
 ### Knowledge of Python and JavaScript
 This is part of my personal project which uses Python as a unified language for both frontend and backend. However, the part introduced in this article can run independently on the frontend (browser side) without requiring the backend. If you want to implement it purely in JavaScript, it is possible, but you may need to rewrite many modules from scratch.
 
